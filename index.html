@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+		crossorigin="anonymous"></script>
+
+	<link href="lib/jsoneditor/jsoneditor.min.css" rel="stylesheet" type="text/css">
+	<script src="lib/jsoneditor/jsoneditor.min.js"></script>
+	<script src="lib/crypto.js" type="text/javascript" charset="utf-8"></script>
+
+	<style>
+		html { font-size: 14px; }
+
+		.accordion-button.collapsed { background-color: var(--bs-accordion-active-bg); }
+
+		#xeditorContainer { display: none; }
+	</style>
+</head>
+
+<body>
+	<div class="container p-4">
+		<main>
+			<h1>CrossCode Save Decryptor/Editor</h1>
+
+			<div class="mb-3">
+				<div class="accordion mb-3" id="infoAccordion">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="infoHeading">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#info1" aria-expanded="false" aria-controls="info1"><i class="bi bi-info-circle"></i>&nbsp;Info</button>
+						</h2>
+
+						<div id="info1" class="accordion-collapse collapse" aria-labelledby="infoHeading" data-bs-parent="#infoAccordion">
+							<div class="accordion-body">
+								<p>Basic details of the CrossCode save game location and format can be found here:
+								<a href="https://crosscode.fandom.com/wiki/Savegame">https://crosscode.fandom.com/wiki/Savegame</a></p>
+								<p>CrossCode save games are located in the cc.save file in these locations:</p>
+
+								<table class="table table-bordered table-sm">
+									<thead>
+										<tr>
+											<th>OS</th>
+											<th>Path</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>MacOS</td>
+											<td>~/Library/Application Support/CrossCode/Default/cc.save</td>
+										</tr>
+										<tr>
+											<td>Linux</td>
+											<td>~/.config/CrossCode/Default/cc.save</td>
+										</tr>
+										<tr>
+											<td>Windows</td>
+											<td>%LOCALAPPDATA%\CrossCode\cc.save</td>
+										</tr>
+										<tr>
+											<td>Windows (Microsoft Store/Xbox Game Pass)</td>
+											<td>%LOCALAPPDATA%\Packages\DECK13.CrossCodePC_rn1dn9jh54zft\LocalCache\Local\CrossCode\cc.save</td>
+										</tr>
+									</tbody>
+								</table>
+
+								<p>The <span class="text-primary-emphasis font-monospace">cc.save</span> file is a JSON file, but the values are prefixed with an indicator string (<span class="text-primary-emphasis font-monospace">[-!_0_!-]</span>), base64 encoded and AES encrypted.  However, the game already supports reading either these encrypted strings <em>or</em> plain JSON.  This editor takes advantage of this and will leave the file unencrypted to make editing it much easier.</p>
+
+								<h2>How To Use</h2>
+								<p>
+									<ol>
+										<li><i class="bi bi-exclamation-triangle-fill"></i>&nbsp;Backup your original cc.save file.</li>
+										<li>Click <span class="text-primary-emphasis">Choose File</span> and load your save file.  Any encrypted values will be decrypted, converted into plain JSON and displayed in the editor below.</li>
+										<li>Make any changes you want.</li>
+										<li>Click <span class="text-primary-emphasis">Export</span> to download the decrypted (and edited) file</li>
+										<li>Overwrite your original cc.save file.</li>
+									</ol>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<label for="formFile" class="form-label">Open your save game file to decrypt and edit.</label>
+				<input class="form-control" type="file" id="inputFile" accept=".save">
+			</div>
+
+			<div id="editorContainer" class="mb-3" style="width: 100%; height: 600px;"></div>
+
+			<div class="mb-3">
+				<button id="exportButton" class="btn btn-primary" disabled onclick="exportSavedGames();">Export</button>
+			</div>
+
+			<hr />
+
+			<div>
+				<p>If you just want to decrypt one of the encrypted values, paste the value below (with or without the prefix) and click 'Decrypt' to see the JSON.</p>
+
+				<div class="container text-center">
+					<div class="row">
+						<div class="col-5">
+							<label for="sourceTextArea" class="form-label">Encrypted value</label>
+							<textarea id="sourceTextArea" class="form-control" rows="10"></textarea>
+						</div>
+						<div class="col-2 mt-5">
+							<button id="decryptButton" class="btn btn-secondary" onclick="decryptSource()">Decrypt&nbsp;<i class="bi bi-caret-right-fill"></i></button>
+						</div>
+						<div class="col-5">
+							<label for="targetTextArea" class="form-label">Decrypted value</label>
+							<textarea id="targetTextArea" class="form-control" rows="10"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+<script src="src/main.js"></script>
+</html>
